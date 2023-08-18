@@ -1,59 +1,104 @@
-# Streamlit App Deployment on AWS EC2
+# Streamlit App Docker Image
 
-This repository contains instructions and resources to deploy a Streamlit app on an AWS EC2 instance.
+This guide provides step-by-step instructions for setting up and deploying a Streamlit app using Docker on an AWS EC2 instance.
 
 ## Prerequisites
 
-- AWS Account
-- Streamlit app code
-- SSH Key Pair
+- AWS Account: Login to your AWS console and launch an EC2 instance.
 
-## Steps to Deploy
+## Installation
 
-1. Launch an EC2 instance on AWS.
-2. Configure security groups to allow inbound traffic on SSH and the required app port.
-3. Generate or use an existing SSH key pair to connect to the EC2 instance.
-4. SSH into the EC2 instance:
+SSH into your EC2 instance and follow these steps:
+
+1. **Update the package list:**
 
     ```sh
-    ssh -i /path/to/your-key.pem ec2-user@your-instance-ip
-    ```
-5. Update Ubuntu
-    ```sh
-    sudo apt update 
+    sudo apt-get update -y
     ```
 
-6. Install Python 3 and pip:
+2. **Upgrade installed packages:**
 
     ```sh
-    sudo apt install python3 python3-pip
+    sudo apt-get upgrade
     ```
 
-7. Install git & required apps
-
-    ```sh
-    sudo apt install git curl unzip tar make sudo vim wget -y
-    ```
-8. Clone your repository
-    ```sh
-    git clone "Your-repository"
-    ```
-9. Navigate to the app directory & install dependencies:
+3. **Install Docker:**
 
     ```sh
-    pip3 install -r requirements.txt
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sudo sh get-docker.sh
+    sudo usermod -aG docker ubuntu
+    newgrp docker
     ```
 
-10. Run your Streamlit app:
+4. **Clone your project repository:**
 
     ```sh
-    python3 -m streamlit run app.py
-    ```
-11. Permanent running
-    
-    ```sh
-    nohup python3 -m streamlit run app.py
+    git clone "your-project"
     ```
 
-12. Access your Streamlit app in a web browser using your EC2 instance's public IP and the app port.
+5. **Build the Docker image:**
+
+    ```sh
+    docker build -t jojis/streamlit:latest .
+    ```
+
+6. **View all Docker images:**
+
+    ```sh
+    docker images -a
+    ```
+
+7. **Run the Docker container:**
+
+    ```sh
+    docker run -d -p 8501:8501 jojis/streamlit
+    ```
+
+8. **View active containers:**
+
+    ```sh
+    docker ps
+    ```
+
+9. **Stop a container (replace `container_id` with the actual container ID):**
+
+    ```sh
+    docker stop container_id
+    ```
+
+10. **Remove stopped containers:**
+
+    ```sh
+    docker rm $(docker ps -a -q)
+    ```
+
+11. **Login to Docker (if not already logged in):**
+
+    ```sh
+    docker login
+    ```
+
+12. **Push the Docker image to Docker Hub:**
+
+    ```sh
+    docker push jojis/streamlit:latest
+    ```
+
+13. **Remove a Docker image (optional):**
+
+    ```sh
+    docker rmi jojis/streamlit:latest
+    ```
+
+14. **Pull the Docker image (if needed):**
+
+    ```sh
+    docker pull jojis/streamlit
+    ```
+
+Remember to configure your AWS security groups and firewall settings to allow traffic on port 8501.
+
+**Note:** Ensure that port mapping is done correctly for port 8501.
+
 
